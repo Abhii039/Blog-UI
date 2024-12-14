@@ -1,0 +1,43 @@
+/* admin.css */
+
+.admin {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.user {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.user img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+
+}
+
+.user-details {
+  margin-top: 10px;
+}
+
+.username {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.delete-btn {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #ff6347;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #d9534f;
+}

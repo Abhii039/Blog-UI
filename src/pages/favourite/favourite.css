@@ -1,0 +1,63 @@
+.favorite-container {
+  margin: 20px;
+  padding: 20px;
+}
+
+.favorite-heading {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.imgc {
+  width: 400px;
+  height: 300px;
+  justify-content: center;
+}
+.no-favorites-message {
+  font-style: italic;
+  color: black;
+  font-size: 25px;
+}
+
+.favorite-post {
+  margin-bottom: 15px;
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.favorite-author {
+  font-size: 14px;
+  color: #666;
+}
+
+.favorite-link {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.favorite-link:hover {
+  text-decoration: underline;
+}
+
+.desc {
+  font-family: "Varela Round", sans-serif;
+  font-size: 14px;
+  color: #444;
+  line-height: 24px;
+  margin-top: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+.removeBtn {
+  font-size: 25px;
+  background-color: #212121;
+  color: white;
+  border-color: 212121;
+  margin-top: 2px;
+  border-radius: 10px;
+}
