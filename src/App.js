@@ -17,6 +17,7 @@ import { Context } from "./context/Context";
 import Admin from './pages/admin/Admin';
 import AboutPage from "./pages/about/About";
 import Favorites from './pages/favorites/Favorites';
+import MyPosts from "./pages/mypost/MyPosts";
 
 // function App() {
 //   const currentUser = true;
@@ -54,7 +55,7 @@ function App() {
         <Route path="/post/:postId" element={<Single />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/about" element={<AboutPage />} />
-   
+        <Route path="/myposts" element={<MyPosts/>}/>
         <Route path="/favorites" element={<Favorites />} />
       </Routes>
     </Router>

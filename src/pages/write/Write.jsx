@@ -53,6 +53,7 @@ export default function Write() {
 
     try {
       let categoryResponse;
+      var newCategoryResponse;
       if (category.trim()) {
         // Check if the category already exists
         const existingCategories = await axios.get("https://blog-api-na5i.onrender.com/api/categories");
@@ -63,18 +64,19 @@ export default function Write() {
           categoryResponse = existingCategory;
         } else {
           // Create a new category
-          categoryResponse = await axios.post("https://blog-api-na5i.onrender.com/api/categories", {
-            name: category.toLowerCase().trim(),
+           newCategoryResponse = await axios.post("https://blog-api-na5i.onrender.com/api/categories", {
+            name:  category.toLowerCase().trim(),
           });
+          categoryResponse = newCategoryResponse.data;
         }
       }
-
+        console.log("Response==",categoryResponse.name)
       // Prepare the new post object
       const newPost = {
         username: user?.user?.username,
         title,
         desc,
-        categories: categoryResponse ? [categoryResponse._id] : [], // Use ID of the category
+        categories: categoryResponse ? [categoryResponse.name] : [], // Use ID of the category
       };
 
       if (file) {
@@ -89,15 +91,16 @@ export default function Write() {
       }
 
       // Create or update the post
+      let response;
       if (postId) {
         // Update existing post
-        await axios.put(`https://blog-api-na5i.onrender.com/api/posts/${postId}`, newPost);
+        response = await axios.put(`https://blog-api-na5i.onrender.com/api/posts/${postId}`, newPost);
       } else {
         // Create new post
-        await axios.post("https://blog-api-na5i.onrender.com/api/posts", newPost);
+        response = await axios.post("https://blog-api-na5i.onrender.com/api/posts", newPost);
       }
-
-      window.location.replace("/post/" + postId); // Redirect to the new or updated post
+      var Id = response.data._id;
+      window.location.replace("/post/" + Id); // Redirect to the new or updated post
     } catch (err) {
       console.log("Error:", err); // Log the error
       setError(err.response?.data?.message || "Failed to create or update post");
