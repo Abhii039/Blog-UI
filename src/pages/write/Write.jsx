@@ -81,13 +81,20 @@ export default function Write() {
 
       if (file) {
         const data = new FormData();
-        const filename = Date.now() + file.name;
-        data.append("name", filename);
         data.append("file", file);
-        newPost.photo = filename; // Add photo filename to the post object
-
-        // Upload the file
-        await axios.post("https://blog-api-na5i.onrender.com/api/upload", data);
+  
+        try {
+          const uploadResponse = await axios.post(
+            "https://blog-api-na5i.onrender.com/api/upload",
+            data,
+            {
+              headers: { "Content-Type": "multipart/form-data" },
+            }
+          );
+          newPost.photo = uploadResponse.data.fileId; // Save the file ID from MongoDB
+        } catch (uploadErr) {
+          throw new Error("File upload failed. Please try again.");
+        }
       }
 
       // Create or update the post
