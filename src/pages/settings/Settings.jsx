@@ -26,13 +26,14 @@ export default function Settings() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { user, dispatch } = useContext(Context);
-  const PF = "https://blog-api-na5i.onrender.com/api/images/";
+  const PF = "/api/images/";
 
   useEffect(() => {
     if (user?.user) {
       setUsername(user.user.username || "");
       setEmail(user.user.email || "");
     }
+
   }, [user]);
 
   const handleSubmit = async (e) => {
@@ -52,14 +53,12 @@ export default function Settings() {
       };
 
       if (file) {
-        const data = new FormData();
-        const filename = Date.now() + file.name;
-        data.append("name", filename);
-        data.append("file", file);
-        updatedUser.profilePic = filename;
-        
         try {
-          await axios.post("https://blog-api-na5i.onrender.com/api/upload", data);
+          const data = new FormData();
+        const filename = Date.now() + file.name;
+        data.append("image", file);
+        const response = await axios.post("/api/upload", data);
+        updatedUser.profilePic = response.data.imageUrl;
         } catch (err) {
           setError("Failed to upload profile picture");
           setLoading(false);
@@ -67,7 +66,7 @@ export default function Settings() {
         }
       }
 
-      const res = await axios.put("https://blog-api-na5i.onrender.com/api/users/" + user.user._id, updatedUser);
+      const res = await axios.put("/api/users/" + user.user._id, updatedUser);
       setSuccess(true);
       dispatch({ type: "UPDATE_SUCCESS", payload: { ...user, user: res.data }});
     } catch (err) {
@@ -81,7 +80,7 @@ export default function Settings() {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
       try {
-        await axios.delete(`https://blog-api-na5i.onrender.com/api/users/${user.user._id}`);
+        await axios.delete(`/api/users/${user.user._id}`);
         dispatch({ type: "LOGOUT" });
         window.location.replace("/");
       } catch (err) {
@@ -118,7 +117,7 @@ export default function Settings() {
           <Stack spacing={3} alignItems="center">
             <Box sx={{ position: 'relative' }}>
               <Avatar
-                src={file ? URL.createObjectURL(file) : PF + user?.user?.profilePic}
+                src={file ? URL.createObjectURL(file) : user?.user?.profilePic}
                 sx={{ 
                   width: 120, 
                   height: 120,

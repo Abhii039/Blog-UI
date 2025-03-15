@@ -30,14 +30,14 @@ export default function Single() {
   const [post, setPost] = useState({});
   const [loading, setLoading] = useState(true);
   const { user } = useContext(Context);
-  const PF = "https://blog-api-na5i.onrender.com/images/";
+  const PF = "/api/images/";
   const [isFavorite, setIsFavorite] = useState(false);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const getPost = async () => {
       try {
-        const res = await axios.get("https://blog-api-na5i.onrender.com/api/posts/" + path);
+        const res = await axios.get("/api/posts/" + path);
         setPost(res.data);
       } catch (err) {
         console.error(err);
@@ -51,7 +51,7 @@ export default function Single() {
   useEffect(() => {
     const checkFavorite = async () => {
       try {
-        const userRes = await axios.get(`https://blog-api-na5i.onrender.com/api/users/${user.user._id}`);
+        const userRes = await axios.get(`/api/users/${user.user._id}`);
         setIsFavorite(userRes.data.favorites.includes(post._id));
       } catch (err) {
         console.error(err);
@@ -65,7 +65,7 @@ export default function Single() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("https://blog-api-na5i.onrender.com/api/categories");
+        const response = await axios.get("/api/categories");
         const allCategories = response.data;
       
         // Check if post.categories is defined and is an array
@@ -86,7 +86,7 @@ export default function Single() {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
-        await axios.delete(`https://blog-api-na5i.onrender.com/api/posts/${post._id}`, {
+        await axios.delete(`/api/posts/${post._id}`, {
           data: { username: user.user.username },
         });
         window.location.replace("/");
@@ -98,7 +98,7 @@ export default function Single() {
 
   const handleFavorite = async () => {
     try {
-      await axios.post(`https://blog-api-na5i.onrender.com/api/users/${user.user._id}/favorites`, {
+      await axios.post(`/api/users/${user.user._id}/favorites`, {
         postId: post._id
       });
       setIsFavorite(!isFavorite);
@@ -142,7 +142,7 @@ export default function Single() {
             }}
           >
             <img
-              src={PF + post.photo}
+              src={post.photo}
               alt={post.title}
               style={{
                 width: '100%',

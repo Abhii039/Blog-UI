@@ -49,7 +49,7 @@ export default function Post({ post }) {
               height: { xs: 200, sm: 280 },
               objectFit: 'cover'
             }}
-            image={PF + post.photo}
+            image={post.photo}
             alt={post.title}
           />
         )}

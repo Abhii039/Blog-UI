@@ -82,7 +82,7 @@ export default function Login() {
     try {
 
 
-      const res = await axios.post("https://blog-api-na5i.onrender.com/api/auth/login", formData);
+      const res = await axios.post("/api/auth/login", formData);
       
       console.log("Response received:", res.data);
 

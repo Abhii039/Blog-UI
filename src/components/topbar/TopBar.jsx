@@ -173,7 +173,7 @@ export default function TopBar() {
                 >
                   <Avatar
                     alt={user.username}
-                    src={PF + user.user.profilePic} // Ensure this is correct
+                    src={user.user.profilePic} // Ensure this is correct
                     sx={{ width: 40, height: 40 }}
                   />
                 </IconButton>

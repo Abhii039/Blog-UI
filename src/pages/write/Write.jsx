@@ -30,11 +30,12 @@ export default function Write() {
     const fetchPostData = async () => {
       if (postId) {
         try {
-          const response = await axios.get(`https://blog-api-na5i.onrender.com/api/posts/${postId}`);
+          const response = await axios.get(`/api/posts/${postId}`);
           const post = response.data;
           setTitle(post.title);
           setDesc(post.desc);
-          setCategory(post.categories[0]); // Assuming categories is an array
+          setCategory(post.categories[0]);
+          setFile(post.photo); // Assuming categories is an array
           // You may want to fetch the image if needed
         } catch (err) {
           console.error("Error fetching post data:", err);
@@ -56,7 +57,7 @@ export default function Write() {
       var newCategoryResponse;
       if (category.trim()) {
         // Check if the category already exists
-        const existingCategories = await axios.get("https://blog-api-na5i.onrender.com/api/categories");
+        const existingCategories = await axios.get("/api/categories");
         const existingCategory = existingCategories.data.find(cat => cat.name.toLowerCase() === category.toLowerCase());
 
         if (existingCategory) {
@@ -64,7 +65,7 @@ export default function Write() {
           categoryResponse = existingCategory;
         } else {
           // Create a new category
-           newCategoryResponse = await axios.post("https://blog-api-na5i.onrender.com/api/categories", {
+           newCategoryResponse = await axios.post("/api/categories", {
             name:  category.toLowerCase().trim(),
           });
           categoryResponse = newCategoryResponse.data;
@@ -81,18 +82,21 @@ export default function Write() {
 
       if (file) {
         const data = new FormData();
-        data.append("file", file);
+        data.append("image", file);
   
         try {
           const uploadResponse = await axios.post(
-            "https://blog-api-na5i.onrender.com/api/upload",
+            "/api/upload",
             data,
             {
               headers: { "Content-Type": "multipart/form-data" },
             }
           );
-          newPost.photo = uploadResponse.data.fileId; // Save the file ID from MongoDB
+          console.log(uploadResponse.data);
+          newPost.photo = uploadResponse.data.imageUrl; // Save the file ID from MongoDB
         } catch (uploadErr) {
+          console.error("File upload error:", uploadErr); // Log the error message in more detail
+          console.error("Response error:", uploadErr.response?.data); 
           throw new Error("File upload failed. Please try again.");
         }
       }
@@ -101,10 +105,10 @@ export default function Write() {
       let response;
       if (postId) {
         // Update existing post
-        response = await axios.put(`https://blog-api-na5i.onrender.com/api/posts/${postId}`, newPost);
+        response = await axios.put(`/api/posts/${postId}`, newPost);
       } else {
         // Create new post
-        response = await axios.post("https://blog-api-na5i.onrender.com/api/posts", newPost);
+        response = await axios.post("/api/posts", newPost);
       }
       var Id = response.data._id;
       window.location.replace("/post/" + Id); // Redirect to the new or updated post
@@ -137,7 +141,7 @@ export default function Write() {
             }}
           >
             <img
-              src={URL.createObjectURL(file)}
+              src={file}
               alt="Post"
               style={{
                 width: '100%',
@@ -154,7 +158,7 @@ export default function Write() {
               type="file"
               id="fileInput"
               style={{ display: "none" }}
-              onChange={(e) => setFile(e.target.files[0])}
+              onChange={(e) => {setFile(e.target.files[0]); console.log(e.target.files[0])}}
             />
             <label htmlFor="fileInput">
               <Button

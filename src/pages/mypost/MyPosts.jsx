@@ -13,7 +13,7 @@ export default function MyPosts() {
    const fetchUserPosts = async () => {
      if (!user) return; // Ensure user is logged in
      try {
-       const res = await axios.post("https://blog-api-na5i.onrender.com/api/posts/userPosts", {
+       const res = await axios.post("/api/posts/userPosts", {
          username: user.user.username, // Send the username in the request body
        });
        console.log(user.user.username);

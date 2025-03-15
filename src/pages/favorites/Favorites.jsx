@@ -19,7 +19,7 @@ export default function Favorites() {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const res = await axios.get(`https://blog-api-na5i.onrender.com/api/users/${user.user._id}/favorites`);
+        const res = await axios.get(`/api/users/${user.user._id}/favorites`);
         setPosts(res.data);
       } catch (err) {
         console.error(err);

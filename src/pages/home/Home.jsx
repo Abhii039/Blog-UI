@@ -33,7 +33,7 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get("https://blog-api-na5i.onrender.com/api/posts" + search);
+        const res = await axios.get("/api/posts" + search);
         const sortedPosts = res.data.sort((a, b) => 
           new Date(b.createdAt) - new Date(a.createdAt)
         );
