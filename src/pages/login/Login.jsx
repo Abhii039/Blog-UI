@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useContext } from "react";
 import { Context } from "../../context/Context";
 import { 
@@ -80,13 +79,21 @@ export default function Login() {
     dispatch({ type: "LOGIN_START" });
 
     try {
-      const res = await axios.post("/api/auth/login", formData);
-      
-      console.log("Response received:", res.data);
+      const response = await fetch("https://blog-api-na5i.onrender.com/api/auth/login", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-      if (res.data.user && res.data.token) {
-        localStorage.setItem("user", JSON.stringify(res.data));
-        dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
+      const res = await response.json();
+      
+      console.log("Response received:", res.user);
+
+      if (res.user && res.token) {
+        localStorage.setItem("user", JSON.stringify(res));
+        dispatch({ type: "LOGIN_SUCCESS", payload: res });
         navigate("/");
       } else {
         throw new Error("Invalid response format");
@@ -94,14 +101,14 @@ export default function Login() {
       
     } catch (err) {
       console.error("Login error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
+        status: err.status,
+        statusText: err.statusText,
+        data: err.data,
+        url: err.url
       });
       
       setError(
-        err.response?.data?.message || 
+        err.message || 
         'Invalid username or password. Please try again.'
       );
       dispatch({ type: "LOGIN_FAILURE" });
