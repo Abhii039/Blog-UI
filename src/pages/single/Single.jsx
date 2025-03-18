@@ -22,6 +22,8 @@ import {
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon
 } from '@mui/icons-material';
+import { jsPDF } from "jspdf";
+import Comment from '../../components/comment/Comment';
 
 export default function Single() {
   const location = useLocation();
@@ -130,6 +132,58 @@ export default function Single() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    const doc = new jsPDF();
+    
+    // Set heading color to blue
+    doc.setTextColor(52, 152, 219); // RGB for blue color
+    doc.setFontSize(24);
+    
+    // Add heading "BlogSpace" centered
+    const heading = "BlogSpace";
+    const headingWidth = doc.getTextWidth(heading);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    doc.text(heading, (pageWidth - headingWidth) / 2, 10); // Center the heading
+    
+    // Reset color for title
+    doc.setTextColor(0); // Reset to black for the title
+    doc.setFontSize(20);
+    doc.text(post.title, 10, 20); // Add title
+    
+    // Add image
+    if (post.photo) {
+      const imgData = await getImageData(`${post.photo}`);
+      doc.addImage(imgData, 'JPEG', 10, 30, 180, 100); // Add image with specified dimensions
+    }
+
+    // Add description
+    doc.setFontSize(12);
+    doc.text(post.desc, 10, 140); // Add description
+    
+    // Save the PDF with the post title
+    doc.save(`${post.title}.pdf`);
+  };
+
+  const getImageData = (url) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous"; // Set CORS attribute
+      img.src = url;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const imgData = canvas.toDataURL('image/jpeg');
+        resolve(imgData);
+      };
+      img.onerror = (error) => reject(error);
+    });
+  };
+
+
+
   if (loading) {
     return (
       <Box 
@@ -192,7 +246,7 @@ export default function Single() {
                 {post.title}
               </Typography>
 
-              {post.username === user?.user?.username && (
+              {(post.username === user?.user?.username || user?.user?.username === "admin") && (
                 <Stack direction="row" spacing={1}>
                   <IconButton 
                     component={Link} 
@@ -281,6 +335,17 @@ export default function Single() {
                 </IconButton>
               </Tooltip>
             </Box>
+            <Button
+              variant="contained"
+              onClick={handleDownloadPDF}
+              sx={{ mb: 2, backgroundColor: '#3498db', color: 'white' }}
+            >
+              Download PDF
+            </Button>
+
+            {/* Add Comment Component */}
+            <Divider sx={{ my: 3 }} />
+            <Comment postId={post._id} />
           </Stack>
         </Box>
       </Paper>

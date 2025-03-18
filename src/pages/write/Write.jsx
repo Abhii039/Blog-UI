@@ -18,6 +18,7 @@ export default function Write() {
   const [desc, setDesc] = useState("");
   const [category, setCategory] = useState("");
   const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { user } = useContext(Context);
@@ -47,6 +48,20 @@ export default function Write() {
 
     fetchPostData();
   }, [postId]);
+
+  // Add this useEffect to handle file preview
+  useEffect(() => {
+    if (file && typeof file === 'object') {
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+      
+      // Free memory when component unmounts or file changes
+      return () => URL.revokeObjectURL(objectUrl);
+    } else if (typeof file === 'string') {
+      // If file is a URL string (in edit mode)
+      setPreviewUrl(file);
+    }
+  }, [file]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -159,7 +174,7 @@ export default function Write() {
           backdropFilter: 'blur(10px)'
         }}
       >
-        {file && (
+        {(file || previewUrl) && (
           <Box 
             sx={{
               width: '100%',
@@ -170,7 +185,7 @@ export default function Write() {
             }}
           >
             <img
-              src={file}
+              src={previewUrl}
               alt="Post"
               style={{
                 width: '100%',
@@ -187,7 +202,7 @@ export default function Write() {
               type="file"
               id="fileInput"
               style={{ display: "none" }}
-              onChange={(e) => {setFile(e.target.files[0]); console.log(e.target.files[0])}}
+              onChange={(e) => {setFile(e.target.files[0]);}}
             />
             <label htmlFor="fileInput">
               <Button

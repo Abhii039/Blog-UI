@@ -10,6 +10,7 @@ import {
   Paper,
   Divider,
   IconButton,
+  CircularProgress
 } from '@mui/material';
 import { 
   Create as CreateIcon,
@@ -25,7 +26,7 @@ export default function Register() {
   const [error, setError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex
     return regex.test(email);
@@ -42,6 +43,7 @@ export default function Register() {
     setError("");
     setEmailError("");
     setPasswordError("");
+    setLoading(true);
 
     // Validate email and password
     if (!validateEmail(email)) {
@@ -75,9 +77,12 @@ export default function Register() {
     } catch (err) {
       console.log(err);
       setError("Registration failed. Please try again.");
+    }finally{
+      setLoading(false);
     }
   };
 
+    
   return (
     <Container maxWidth="lg" sx={{ 
       minHeight: '100vh', 
@@ -176,7 +181,11 @@ export default function Register() {
                 }
               }}
             >
-              Register
+               {loading ? (
+                              <CircularProgress size={24} color="inherit" />
+                            ) : (
+                              'Sign Up'
+                            )}
             </Button>
           </form>
 

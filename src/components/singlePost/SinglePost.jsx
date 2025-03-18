@@ -86,7 +86,7 @@ export default function SinglePost() {
         {user.username === null ? (
           <>
             {post.photo && (
-              <img src={PF + post.photo} alt="" className="singlePostImg" />
+              <img src={post.photo} alt="" className="singlePostImg" />
             )}
             {updateMode ? (
               <>
@@ -136,7 +136,7 @@ export default function SinglePost() {
               <h1 className="singlePostTitle">
                 {title}
                 {(post.username === user?.username ||
-                  user.username === "admin") && (
+                  user?.user.username === "admin") && (
                   <div className="singlePostEdit">
                     <i
                       className="singlePostIcon far fa-edit"

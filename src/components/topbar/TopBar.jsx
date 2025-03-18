@@ -50,7 +50,7 @@ export default function TopBar() {
     { label: "WRITE", path: "/write" },
     ...(user ? [{ label: "MY POST", path: "/myposts" }] : []),
     ...(user ? [{ label: "FAVORITE", path: "/favorites" }] : []),
-    ...(user?.username === "admin" ? [{ label: "ADMIN PANEL", path: "/admin" }] : []),
+    ...(user?.user.username === "admin" ? [{ label: "ADMIN PANEL", path: "/admin" }] : []),
   ];
 
   

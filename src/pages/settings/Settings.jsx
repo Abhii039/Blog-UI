@@ -187,12 +187,11 @@ export default function Settings() {
 
             <TextField
               fullWidth
-              label="New Password"
+              label="Password"
               type="password"
               variant="outlined"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Leave blank to keep current password"
             />
 
             {error && (
