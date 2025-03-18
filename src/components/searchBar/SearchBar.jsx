@@ -17,7 +17,6 @@ import {
   Search as SearchIcon,
   Clear as ClearIcon 
 } from '@mui/icons-material';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 export default function SearchBar({ onSearchResults }) {
@@ -46,10 +45,11 @@ export default function SearchBar({ onSearchResults }) {
 
     try {
       setIsLoading(true);
-      const res = await axios.get(`https://blog-api-na5i.onrender.com/api/posts/search?q=${query}`);
-      console.log("Search results:", res.data); // Debug log
-      setSearchResults(res.data);
-      onSearchResults(res.data);
+      const response = await fetch(`https://blog-api-na5i.onrender.com/api/posts/search?q=${query}`);
+      const res = await response.json(); // Parse the JSON response
+      console.log("Search results:", res); // Debug log
+      setSearchResults(res);
+      onSearchResults(res);
     } catch (err) {
       console.error("Search failed:", err);
       setSearchResults([]);

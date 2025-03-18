@@ -20,10 +20,14 @@ export default function SinglePost() {
   useEffect(() => {
     const getPost = async () => {
       try {
-        const res = await axios.get("/posts/" + path);
-        setPost(res.data);
-        setTitle(res.data.title);
-        setDesc(res.data.desc);
+        const response = await fetch(`https://blog-api-na5i.onrender.com/api/posts/${path}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json(); // Parse the JSON response
+        setPost(data);
+        setTitle(data.title);
+        setDesc(data.desc);
       } catch (error) {
         console.error("Error fetching post:", error);
       }
@@ -33,9 +37,16 @@ export default function SinglePost() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`/posts/${post._id}`, {
-        data: { username: user.username },
+      const response = await fetch(`https://blog-api-na5i.onrender.com/api/posts/${post._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: user.username }),
       });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
       window.location.replace("/");
     } catch (error) {
       console.error("Error deleting post:", error);
@@ -44,11 +55,20 @@ export default function SinglePost() {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`/posts/${post._id}`, {
-        username: user.username,
-        title,
-        desc,
+      const response = await fetch(`https://blog-api-na5i.onrender.com/api/posts/${post._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: user.username,
+          title,
+          desc,
+        }),
       });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
       setUpdateMode(false);
     } catch (error) {
       console.error("Error updating post:", error);

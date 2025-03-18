@@ -16,7 +16,6 @@ import {
   GitHub,
   LocalOffer as CategoryIcon
 } from '@mui/icons-material';
-import axios from "axios";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -27,8 +26,12 @@ export default function Sidebar() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("https://blog-api-na5i.onrender.com/api/categories");
-        setCategories(response.data);
+        const response = await fetch("https://blog-api-na5i.onrender.com/api/categories");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json(); // Parse the JSON response
+        setCategories(data);
       } catch (err) {
         setError("Failed to fetch categories");
       } finally {

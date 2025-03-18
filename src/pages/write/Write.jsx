@@ -1,6 +1,5 @@
 import { useState, useContext, useEffect } from "react";
 import "./write.css";
-import axios from "axios";
 import { Context } from "../../context/Context";
 import { 
   Container, 
@@ -30,13 +29,15 @@ export default function Write() {
     const fetchPostData = async () => {
       if (postId) {
         try {
-          const response = await axios.get(`/api/posts/${postId}`);
-          const post = response.data;
+          const response = await fetch(`https://blog-api-na5i.onrender.com/api/posts/${postId}`);
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const post = await response.json(); // Parse the JSON response
           setTitle(post.title);
           setDesc(post.desc);
           setCategory(post.categories[0]);
           setFile(post.photo); // Assuming categories is an array
-          // You may want to fetch the image if needed
         } catch (err) {
           console.error("Error fetching post data:", err);
           setError("Failed to fetch post data");
@@ -57,21 +58,33 @@ export default function Write() {
       var newCategoryResponse;
       if (category.trim()) {
         // Check if the category already exists
-        const existingCategories = await axios.get("/api/categories");
-        const existingCategory = existingCategories.data.find(cat => cat.name.toLowerCase() === category.toLowerCase());
+        const existingCategoriesResponse = await fetch("https://blog-api-na5i.onrender.com/api/categories");
+        if (!existingCategoriesResponse.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const existingCategories = await existingCategoriesResponse.json(); // Parse the JSON response
+        const existingCategory = existingCategories.find(cat => cat.name.toLowerCase() === category.toLowerCase());
 
         if (existingCategory) {
           // Use existing category ID
           categoryResponse = existingCategory;
         } else {
           // Create a new category
-           newCategoryResponse = await axios.post("/api/categories", {
-            name:  category.toLowerCase().trim(),
+          newCategoryResponse = await fetch("https://blog-api-na5i.onrender.com/api/categories", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: category.toLowerCase().trim() }),
           });
-          categoryResponse = newCategoryResponse.data;
+          if (!newCategoryResponse.ok) {
+            throw new Error("Failed to create new category");
+          }
+          categoryResponse = await newCategoryResponse.json(); // Parse the JSON response
         }
       }
-        console.log("Response==",categoryResponse.name)
+      console.log("Response==", categoryResponse.name);
+
       // Prepare the new post object
       const newPost = {
         username: user?.user?.username,
@@ -85,15 +98,15 @@ export default function Write() {
         data.append("image", file);
   
         try {
-          const uploadResponse = await axios.post(
-            "/api/upload",
-            data,
-            {
-              headers: { "Content-Type": "multipart/form-data" },
-            }
-          );
-          console.log(uploadResponse.data);
-          newPost.photo = uploadResponse.data.imageUrl; // Save the file ID from MongoDB
+          const uploadResponse = await fetch("https://blog-api-na5i.onrender.com/api/upload", {
+            method: 'POST',
+            body: data,
+          });
+          if (!uploadResponse.ok) {
+            throw new Error("File upload failed");
+          }
+          const uploadData = await uploadResponse.json(); // Parse the JSON response
+          newPost.photo = uploadData.imageUrl; // Save the file ID from MongoDB
         } catch (uploadErr) {
           console.error("File upload error:", uploadErr); // Log the error message in more detail
           console.error("Response error:", uploadErr.response?.data); 
@@ -105,16 +118,32 @@ export default function Write() {
       let response;
       if (postId) {
         // Update existing post
-        response = await axios.put(`/api/posts/${postId}`, newPost);
+        response = await fetch(`https://blog-api-na5i.onrender.com/api/posts/${postId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newPost),
+        });
       } else {
         // Create new post
-        response = await axios.post("/api/posts", newPost);
+        response = await fetch("https://blog-api-na5i.onrender.com/api/posts", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newPost),
+        });
       }
-      var Id = response.data._id;
+      if (!response.ok) {
+        throw new Error("Failed to create or update post");
+      }
+      const postData = await response.json(); // Parse the JSON response
+      var Id = postData._id;
       window.location.replace("/post/" + Id); // Redirect to the new or updated post
     } catch (err) {
       console.log("Error:", err); // Log the error
-      setError(err.response?.data?.message || "Failed to create or update post");
+      setError(err.message || "Failed to create or update post");
     } finally {
       setLoading(false);
     }

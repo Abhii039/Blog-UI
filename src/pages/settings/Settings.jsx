@@ -1,6 +1,5 @@
 import { useContext, useState, useEffect } from "react";
 import { Context } from "../../context/Context";
-import axios from "axios";
 import { 
   Container, 
   Paper, 
@@ -33,7 +32,6 @@ export default function Settings() {
       setUsername(user.user.username || "");
       setEmail(user.user.email || "");
     }
-
   }, [user]);
 
   const handleSubmit = async (e) => {
@@ -55,10 +53,17 @@ export default function Settings() {
       if (file) {
         try {
           const data = new FormData();
-        const filename = Date.now() + file.name;
-        data.append("image", file);
-        const response = await axios.post("/api/upload", data);
-        updatedUser.profilePic = response.data.imageUrl;
+          const filename = Date.now() + file.name;
+          data.append("image", file);
+          const response = await fetch("https://blog-api-na5i.onrender.com/api/upload", {
+            method: 'POST',
+            body: data,
+          });
+          if (!response.ok) {
+            throw new Error("Failed to upload profile picture");
+          }
+          const resData = await response.json();
+          updatedUser.profilePic = resData.imageUrl;
         } catch (err) {
           setError("Failed to upload profile picture");
           setLoading(false);
@@ -66,12 +71,22 @@ export default function Settings() {
         }
       }
 
-      const res = await axios.put("/api/users/" + user.user._id, updatedUser);
+      const res = await fetch(`https://blog-api-na5i.onrender.com/api/users/${user.user._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedUser),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update profile");
+      }
+      const updatedUserData = await res.json();
       setSuccess(true);
-      dispatch({ type: "UPDATE_SUCCESS", payload: { ...user, user: res.data }});
+      dispatch({ type: "UPDATE_SUCCESS", payload: { ...user, user: updatedUserData }});
     } catch (err) {
       dispatch({ type: "UPDATE_FAILURE" });
-      setError(err.response?.data?.message || "Failed to update profile");
+      setError(err.message || "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -80,7 +95,12 @@ export default function Settings() {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
       try {
-        await axios.delete(`/api/users/${user.user._id}`);
+        const response = await fetch(`https://blog-api-na5i.onrender.com/api/users/${user.user._id}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          throw new Error("Failed to delete account");
+        }
         dispatch({ type: "LOGOUT" });
         window.location.replace("/");
       } catch (err) {

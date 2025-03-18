@@ -55,14 +55,25 @@ export default function Register() {
     }
 
     try {
-      const res = await axios.post("/api/auth/register", {
-        username,
-        email,
-        password,
+      const response = await fetch("https://blog-api-na5i.onrender.com/api/auth/register", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+        }),
       });
-      res.data && window.location.replace("/login");
+
+      const res = await response.json();
+      
+      if (res) {
+        window.location.replace("/login");
+      }
     } catch (err) {
-      console.log(err.response.data);
+      console.log(err);
       setError("Registration failed. Please try again.");
     }
   };

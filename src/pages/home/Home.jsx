@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import { Context } from "../../context/Context";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
 import Header from "../../components/header/Header";
 import Posts from "../../components/posts/Posts";
 import Sidebar from "../../components/sidebar/Sidebar";
@@ -33,8 +32,12 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get("/api/posts" + search);
-        const sortedPosts = res.data.sort((a, b) => 
+        const response = await fetch(`https://blog-api-na5i.onrender.com/api/posts${search}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json(); // Parse the JSON response
+        const sortedPosts = data.sort((a, b) => 
           new Date(b.createdAt) - new Date(a.createdAt)
         );
         setPosts(sortedPosts);
@@ -66,8 +69,6 @@ export default function Home() {
         minHeight: '100vh',
         background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
       }}>
-     
-        
         {/* Hero Section */}
         <Box 
           sx={{ 

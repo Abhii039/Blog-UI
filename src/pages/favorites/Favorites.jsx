@@ -1,13 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import { Context } from "../../context/Context";
-import axios from 'axios';
 import { 
   Container, 
   Typography, 
   Box, 
   CircularProgress,
-  Paper,
-  Stack
+  Paper
 } from '@mui/material';
 import Posts from "../../components/posts/Posts";
 
@@ -19,8 +17,12 @@ export default function Favorites() {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const res = await axios.get(`/api/users/${user.user._id}/favorites`);
-        setPosts(res.data);
+        const response = await fetch(`https://blog-api-na5i.onrender.com/api/users/${user.user._id}/favorites`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json(); // Parse the JSON response
+        setPosts(data);
       } catch (err) {
         console.error(err);
       } finally {

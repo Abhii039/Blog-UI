@@ -1,7 +1,6 @@
 // Admin.js
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import "./admin.css"; // Importing CSS file
 import { Link } from "react-router-dom";
 
@@ -12,9 +11,13 @@ export default function Admin() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("/users/");
+        const response = await fetch("https://blog-api-na5i.onrender.com/api/users/");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json(); // Parse the JSON response
         // Filter out the admin user
-        const filteredUsers = res.data.filter(user => user.username !== "admin");
+        const filteredUsers = data.filter(user => user.username !== "admin");
         setUsers(filteredUsers);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -25,9 +28,16 @@ export default function Admin() {
 
   const handleDeleteUser = async (userId) => {
     try {
-      await axios.delete(`/users/${userId}`, {
-        data: { username: "admin" },
+      const response = await fetch(`https://blog-api-na5i.onrender.com/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: "admin" }),
       });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
       window.location.reload(); // Reloading the page after deletion
     } catch (error) {
       console.error("Error deleting user:", error);

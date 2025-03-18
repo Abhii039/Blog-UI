@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Context } from "../../context/Context";
-import axios from "axios";
 import { 
   Container, 
   Box, 
@@ -30,15 +29,18 @@ export default function Single() {
   const [post, setPost] = useState({});
   const [loading, setLoading] = useState(true);
   const { user } = useContext(Context);
-  const PF = "/api/images/";
   const [isFavorite, setIsFavorite] = useState(false);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const getPost = async () => {
       try {
-        const res = await axios.get("/api/posts/" + path);
-        setPost(res.data);
+        const response = await fetch(`https://blog-api-na5i.onrender.com/api/posts/${path}`);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json(); // Parse the JSON response
+        setPost(data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -51,8 +53,12 @@ export default function Single() {
   useEffect(() => {
     const checkFavorite = async () => {
       try {
-        const userRes = await axios.get(`/api/users/${user.user._id}`);
-        setIsFavorite(userRes.data.favorites.includes(post._id));
+        const userRes = await fetch(`https://blog-api-na5i.onrender.com/api/users/${user.user._id}`);
+        if (!userRes.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const userData = await userRes.json(); // Parse the JSON response
+        setIsFavorite(userData.favorites.includes(post._id));
       } catch (err) {
         console.error(err);
       }
@@ -65,8 +71,11 @@ export default function Single() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("/api/categories");
-        const allCategories = response.data;
+        const response = await fetch("https://blog-api-na5i.onrender.com/api/categories");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const allCategories = await response.json(); // Parse the JSON response
       
         // Check if post.categories is defined and is an array
         if (Array.isArray(post.categories)) {
@@ -86,9 +95,16 @@ export default function Single() {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
-        await axios.delete(`/api/posts/${post._id}`, {
-          data: { username: user.user.username },
+        const response = await fetch(`https://blog-api-na5i.onrender.com/api/posts/${post._id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username: user.user.username }),
         });
+        if (!response.ok) {
+          throw new Error("Failed to delete post");
+        }
         window.location.replace("/");
       } catch (err) {
         console.error(err);
@@ -98,9 +114,16 @@ export default function Single() {
 
   const handleFavorite = async () => {
     try {
-      await axios.post(`/api/users/${user.user._id}/favorites`, {
-        postId: post._id
+      const response = await fetch(`https://blog-api-na5i.onrender.com/api/users/${user.user._id}/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId: post._id }),
       });
+      if (!response.ok) {
+        throw new Error("Failed to update favorites");
+      }
       setIsFavorite(!isFavorite);
     } catch (err) {
       console.error(err);
