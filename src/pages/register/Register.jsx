@@ -10,23 +10,33 @@ import {
   Paper,
   Divider,
   IconButton,
-  CircularProgress
+  CircularProgress,
+  InputAdornment,
+  Alert
 } from '@mui/material';
 import { 
   Create as CreateIcon,
   Facebook as FacebookIcon,
   Twitter as TwitterIcon,
-  Google as GoogleIcon 
+  Google as GoogleIcon,
+  Visibility,
+  VisibilityOff,
+  Person as PersonIcon,
+  Lock as LockIcon,
+  Email
 } from '@mui/icons-material';
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex
     return regex.test(email);
@@ -43,16 +53,31 @@ export default function Register() {
     setError("");
     setEmailError("");
     setPasswordError("");
-    setLoading(true);
+    
+    // Check for empty fields before setting loading state
+    if (!username || !email || !password || !confirmPassword) {
+      setError("All fields are required.");
+      return; // Stop execution if any field is empty
+    }
+
+    setLoading(true); // Set loading state only if all fields are filled
 
     // Validate email and password
     if (!validateEmail(email)) {
       setEmailError("Please enter a valid email address.");
+      setLoading(false); // Stop loading if email is invalid
       return;
     }
 
     if (!validatePassword(password)) {
       setPasswordError("Password must be at least 6 characters long and contain at least one letter and one number.");
+      setLoading(false); // Stop loading if password is invalid
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      setLoading(false); // Stop loading if passwords do not match
       return;
     }
 
@@ -77,12 +102,15 @@ export default function Register() {
     } catch (err) {
       console.log(err);
       setError("Registration failed. Please try again.");
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
 
-    
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ 
       minHeight: '100vh', 
@@ -145,6 +173,13 @@ export default function Register() {
               margin="normal"
               onChange={(e) => setUsername(e.target.value)}
               sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
             />
             <TextField
               fullWidth
@@ -155,17 +190,69 @@ export default function Register() {
               error={!!emailError}
               helperText={emailError}
               sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email color="action" />
+                  </InputAdornment>
+                ),
+              }}
             />
             <TextField
               fullWidth
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               variant="outlined"
               margin="normal"
               onChange={(e) => setPassword(e.target.value)}
               error={!!passwordError}
               helperText={passwordError}
+              sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              fullWidth
+              label="Confirm Password"
+              type={showPassword ? 'text' : 'password'}
+              variant="outlined"
+              margin="normal"
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={!!passwordError}
+              helperText={passwordError}
               sx={{ mb: 3 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Button
               fullWidth
@@ -181,11 +268,11 @@ export default function Register() {
                 }
               }}
             >
-               {loading ? (
-                              <CircularProgress size={24} color="inherit" />
-                            ) : (
-                              'Sign Up'
-                            )}
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Sign Up'
+              )}
             </Button>
           </form>
 

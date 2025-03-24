@@ -212,7 +212,7 @@ export default function Comment({ postId }) {
                   {comment.content}
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
-                  <IconButton
+                  {/* <IconButton
                     size="small"
                     onClick={() => handleLike(comment._id)}
                     sx={{ color: comment.likes.includes(user?.user?._id) ? '#e74c3c' : 'inherit' }}
@@ -225,7 +225,7 @@ export default function Comment({ postId }) {
                   </IconButton>
                   <Typography variant="caption" color="text.secondary">
                     {comment.likes.length} likes
-                  </Typography>
+                  </Typography> */}
                   {comment.username === user?.user?.username && (
                     <>
                       <IconButton

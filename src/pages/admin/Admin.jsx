@@ -1,8 +1,9 @@
 // Admin.js
 
 import React, { useEffect, useState } from "react";
-import "./admin.css"; // Importing CSS file
+import { Container, Grid, Card, CardContent, CardMedia, Typography, Button } from "@mui/material";
 import { Link } from "react-router-dom";
+import "./admin.css"; // Importing CSS file
 
 export default function Admin() {
   const [users, setUsers] = useState([]);
@@ -44,30 +45,49 @@ export default function Admin() {
     }
   };
 
-  const allUser = users.map((user) => (
-    <div key={user._id} className="user">
-      <img src={PF + user.profilePic} alt="" className="img" />
-      <div className="user-details">
-        <div className="username">
-          <Link to={`/?user=${user.username}`} className="link">
-            <b>{user.username}</b>
-          </Link>
-        </div>
-        <div>{new Date(user.createdAt).toDateString()}</div>
-        <button className="delete-btn" onClick={() => handleDeleteUser(user._id)}>
-          Delete
-        </button>
-      </div>
-    </div>
-  ));
-
   return (
-    <div className="admin">
-      {allUser.length === 0 ? (
-        <h4><b>No User</b></h4>
-      ) : (
-        allUser
-      )}
-    </div>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Admin Panel
+      </Typography>
+      <Grid container spacing={3}>
+        {users.length === 0 ? (
+          <Typography variant="h6" color="text.secondary">
+            No Users
+          </Typography>
+        ) : (
+          users.map((user) => (
+            <Grid item xs={12} sm={6} md={4} key={user._id}>
+              <Card>
+                <CardMedia
+                  component="img"
+                  height="100"
+                  image={user.profilePic ? user.profilePic : "https://via.placeholder.com/140"}
+                  alt={user.username}
+                />
+                <CardContent>
+                  <Typography variant="h6" component="div">
+                    <Link to={`/?user=${user.username}`} className="link">
+                      {user.username}
+                    </Link>
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Joined on: {new Date(user.createdAt).toDateString()}
+                  </Typography>
+                  <Button 
+                    variant="contained" 
+                    color="error" 
+                    onClick={() => handleDeleteUser(user._id)} 
+                    sx={{ mt: 2 }}
+                  >
+                    Delete
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        )}
+      </Grid>
+    </Container>
   );
 }

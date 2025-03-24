@@ -96,21 +96,14 @@ export default function Login() {
         dispatch({ type: "LOGIN_SUCCESS", payload: res });
         navigate("/");
       } else {
-        throw new Error("Invalid response format");
+        // Set error message for invalid username or password
+        setError('Invalid username or password. Please try again.');
+        dispatch({ type: "LOGIN_FAILURE" });
       }
       
     } catch (err) {
-      console.error("Login error details:", {
-        status: err.status,
-        statusText: err.statusText,
-        data: err.data,
-        url: err.url
-      });
-      
-      setError(
-        err.message || 
-        'Invalid username or password. Please try again.'
-      );
+      console.error("Login error details:", err);
+      setError('An error occurred. Please try again later.');
       dispatch({ type: "LOGIN_FAILURE" });
     } finally {
       setLoading(false);
@@ -248,7 +241,6 @@ export default function Login() {
               )}
             </Button>
           </form>
-
 
           <Typography textAlign="center" color="text.secondary">
             Don't have an account?{' '}
